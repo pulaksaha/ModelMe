@@ -15,9 +15,10 @@
 - `reconstruction/` contains parser, validator, measurement mapper, deformation, optimizer, mesh measurement, mesh validation and GLB export modules.
 - `assets/base_human/base_human.blend` is the asset used by the current service. Other `.blend` files exist but have not been proven redundant; retain them pending Phase 4 asset review.
 - Sample uploads and generated reports/GLBs exist locally. Treat uploaded measurement files as sensitive; exclude them from Git and images.
-- Node 26.5.0, npm 11.17.0, Python 3.12.14, Python 3.9.6 legacy virtualenv, and MongoDB 8.2.7 are available. Docker and Blender are not installed. The configured macOS Blender path is missing.
+- Node 26.5.0, npm 11.17.0, Python 3.12.14, a retained Python 3.9.6 legacy virtualenv, and MongoDB 8.2.7 are available. A clean `.venv312` is installed for project work. Docker and Blender are not installed. The configured macOS Blender path is missing.
 - The project root was not a Git repository when Phase 1 began.
 - The local API responded with `status=degraded`, `blender_found=false`, and `base_blend_found=true`. The browser's fetch error occurred while the API was not listening.
+- Phase 1 created local Git baseline commit `98e104f`; measurement uploads and generated output remain ignored and untracked.
 
 ## Target repository structure
 
@@ -43,13 +44,13 @@ The temporary `backend/` and `reconstruction/` folders will only be removed afte
 
 ## Phases
 
-### Phase 1 — Project setup and service boundary (active)
+### Phase 1 — Project setup and service boundary (local setup complete; container verification pending)
 
 **Scope:** establish Git and ignore rules; record architecture; set up Node/Express + MongoDB health checks and environment configuration; keep the existing FastAPI reconstruction routes usable; define local run instructions and deployment boundaries.
 
 **Dependencies:** Node.js 24 LTS runtime, Express 5, Mongoose 9, Helmet 8. MongoDB is a local service for development and a Compose service in deployment. Python 3.12 is the supported Python runtime; current reconstruction dependencies stay in `backend/requirements.txt` until the worker migration.
 
-**Acceptance checks:** clean Git baseline excludes personal measurement files and generated artifacts; Express liveness responds; readiness accurately reports MongoDB; existing reconstruction API remains reachable; frontend proxy routes work; config contains no secrets; API and frontend dependency lockfiles are committed.
+**Acceptance checks:** clean Git baseline excludes personal measurement files and generated artifacts; Express liveness responds; readiness accurately reports MongoDB; existing reconstruction API remains reachable; frontend proxy routes work; config contains no secrets; API and frontend dependency lockfiles are committed. These local checks have passed. Container image build and Blender-in-container smoke test remain unverified because Docker is not installed.
 
 **Risks:** no Blender or Docker binary is installed locally, so the Blender container build cannot be verified here. The target stack has a Node/Express API but existing model generation is FastAPI; use a temporary proxy bridge until Phase 6 moves job ownership. Mesh license/provenance is not documented.
 
@@ -119,14 +120,17 @@ The temporary `backend/` and `reconstruction/` folders will only be removed afte
 
 ## Current verification log
 
-- **2026-11-08 — Existing API health request:** returned `degraded`; Blender missing, base `.blend` found. This confirms the local generation blocker; it does not verify reconstruction.
-- **Frontend dev server:** previously opened at `http://localhost:3000/`; this verifies only that the UI renders, not API/model generation.
-- **Docker build / MongoDB-backed Express tests / Blender generation:** not yet run for this phase.
+- **2026-11-08 — `services/api`: `npm test`:** 4 passed. Covers Express liveness, API 404, and both Mongo readiness states.
+- **2026-11-08 — MongoDB-backed Express runtime:** `GET /api/health/ready` returned HTTP 200 with `mongodb=connected`.
+- **2026-11-08 — Proxy smoke check:** Express forwarded `GET /api/reconstruction/status/not-a-job` to FastAPI and returned its expected 404 JSON; Vite on port 3000 forwarded both health and reconstruction routes successfully.
+- **2026-11-08 — `./.venv312/bin/python -m unittest tests/test_reconstruction_unittest.py`:** 12 passed against a synthetic fixture. The checked-in unit test no longer reads the local measurement file.
+- **2026-11-08 — `./.venv312/bin/python -m pytest -q tests/test_reconstruction.py tests/test_backend.py`:** 15 passed; one Starlette deprecation warning from its HTTPX TestClient compatibility layer.
+- **2026-11-08 — `frontend/npm run build` with Vite 8.3.6:** passed. The output contains a 1.09 MB JavaScript chunk; performance splitting remains a follow-up.
+- **2026-11-08 — `frontend/npm audit --audit-level=moderate`:** 0 vulnerabilities after upgrading Vite and its React plugin.
+- **2026-11-08 — Compose YAML:** parsed successfully with PyYAML and the expected three services/dependency conditions. Docker Compose's own config validation was unavailable.
+- **2026-11-08 — API health:** reports `degraded` because Blender is absent; a generated avatar is not verified.
+- **Docker image build / Docker Compose validation / Blender generation:** not run because Docker and Blender are unavailable locally.
 
-## Phase 1 work in progress
+## Phase 1 summary and next step
 
-1. Establish repository hygiene and local baseline.
-2. Add Express health endpoints and MongoDB readiness connection.
-3. Keep legacy FastAPI generation route available through a proxy while frontend talks to Express.
-4. Install and lock only Phase 1 dependencies.
-5. Run Phase 1 checks, document limitations, and then start Phase 2.
+Phase 1 local setup is complete: Git baseline and privacy ignore rules, Express/MongoDB readiness, Python 3.12 environment, dependency locks, synthetic fixtures, and the temporary Express → FastAPI route bridge are in place. The only deferred Phase 1 check is building the container image. Next is Phase 2 authentication and dashboard; add its dependencies only when implementation starts.

@@ -23,6 +23,7 @@ frontend/dist/
 
 # Python/macOS/editor artifacts
 __pycache__/
+.pytest_cache/
 *.py[cod]
 .DS_Store
 .idea/
