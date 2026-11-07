@@ -1,0 +1,36 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Runtime outputs and user measurement data
+input/*.json
+storage/generated/*
+output/*
+170_measurements.json
+*_validation_report.json
+contour_validation_report.json
+measurement_validation_report.json
+mesh_analysis_report.json
+
+# Local runtimes and dependencies
+.venv/
+.venv*/
+node_modules/
+frontend/node_modules/
+services/api/node_modules/
+frontend/dist/
+
+# Python/macOS/editor artifacts
+__pycache__/
+*.py[cod]
+.DS_Store
+.idea/
+.vscode/
+
+# Preserve only the configured base mesh; retain other source meshes locally
+# until the Phase 4 asset review establishes whether they are needed.
+*.blend
+*.blend1
+!assets/base_human/base_human.blend
+

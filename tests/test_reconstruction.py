@@ -1,0 +1,217 @@
+"""
+Test Suite — Reconstruction Engine & Pipeline
+==============================================
+Tests for:
+1. Valid JSON parsing
+2. Missing measurements
+3. Invalid measurement values
+4. Incorrect units
+5. Missing landmarks
+6. Coordinate conversion
+7. Measurement extraction
+8. Cross-section circumference calculation
+9. Mesh deformation
+10. Measurement validation
+11. Optimisation convergence
+12. GLB export
+
+Author: Body Reconstruction Engine
+"""
+
+import json
+import math
+import tempfile
+from pathlib import Path
+import pytest
+
+from reconstruction.json_parser import (
+    MeasurementJSONParser,
+    LandmarkPoint,
+    CrossSectionData,
+    ParsedMeasurements,
+)
+from reconstruction.measurement_validator import (
+    MeasurementValidator,
+    ValidationReport,
+)
+from reconstruction.body_parameter_mapper import BodyParameterMapper
+
+
+SAMPLE_JSON_PATH = Path(__file__).resolve().parent / "fixtures" / "synthetic_measurements.json"
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Test 1: Valid JSON parsing
+# ──────────────────────────────────────────────────────────────────────────────
+def test_valid_json_parsing():
+    parser = MeasurementJSONParser()
+    parsed = parser.parse_file(SAMPLE_JSON_PATH)
+
+    assert parsed.session_id == "synthetic_172"
+    assert parsed.unit == "cm"
+    assert parsed.get_value("height_cm") == 172.0
+    assert parsed.get_value("chest_circumference_cm") == 90.0
+    assert parsed.get_value("waist_circumference_cm") == 72.5
+    assert parsed.get_value("hip_circumference_cm") == 96.0
+    assert len(parsed.available_measurements()) >= 40
+    assert len(parsed.landmarks) >= 30
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Test 2: Missing measurements handling
+# ──────────────────────────────────────────────────────────────────────────────
+def test_missing_measurements_handling():
+    data = {
+        "session_id": "test_missing",
+        "unit": "cm",
+        "measurements": {
+            "height_cm": {"value": 175.0, "status": "valid"},
+            "chest_circumference_cm": {"value": 95.0, "status": "valid"},
+            "thigh_circumference_cm": {"value": None, "status": "needs_user_input"},
+        }
+    }
+    parser = MeasurementJSONParser()
+    parsed = parser.parse_dict(data)
+
+    assert parsed.get_value("height_cm") == 175.0
+    assert parsed.get_value("thigh_circumference_cm") is None
+    assert "thigh_circumference_cm" in parsed.missing_measurements()
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Test 3: Invalid measurement values
+# ──────────────────────────────────────────────────────────────────────────────
+def test_invalid_measurement_values():
+    data = {
+        "session_id": "test_invalid",
+        "unit": "cm",
+        "measurements": {
+            "height_cm": {"value": 350.0, "status": "valid"},  # Impossible height > 230cm
+            "waist_circumference_cm": {"value": -10.0, "status": "valid"},  # Negative
+        }
+    }
+    parser = MeasurementJSONParser()
+    parsed = parser.parse_dict(data)
+    validator = MeasurementValidator()
+    report = validator.validate(parsed)
+
+    assert not report.is_valid
+    out_of_range = report.out_of_range_fields()
+    assert "height_cm" in out_of_range or "waist_circumference_cm" in out_of_range
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Test 4: Incorrect units handling
+# ──────────────────────────────────────────────────────────────────────────────
+def test_incorrect_units_handling():
+    data = {
+        "session_id": "test_units",
+        "unit": "inches",
+        "measurements": {
+            "height_cm": {"value": 67.0, "status": "valid"},
+            "chest_circumference_cm": {"value": 36.0, "status": "valid"},
+            "waist_circumference_cm": {"value": 30.0, "status": "valid"},
+            "hip_circumference_cm": {"value": 38.0, "status": "valid"},
+        }
+    }
+    parser = MeasurementJSONParser()
+    parsed = parser.parse_dict(data)
+    validator = MeasurementValidator()
+    report = validator.validate(parsed)
+
+    # Should emit unit warning
+    assert any("inches" in w.lower() for w in report.warnings)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Test 5: Missing landmarks fallback
+# ──────────────────────────────────────────────────────────────────────────────
+def test_missing_landmarks_fallback():
+    data = {
+        "session_id": "test_no_landmarks",
+        "unit": "cm",
+        "measurements": {
+            "height_cm": {"value": 170.0, "status": "valid"},
+            "chest_circumference_cm": {"value": 90.0, "status": "valid"},
+            "waist_circumference_cm": {"value": 75.0, "status": "valid"},
+            "hip_circumference_cm": {"value": 95.0, "status": "valid"},
+        },
+        "landmarks_3d": {"coordinate_frame": "world_y_up", "points": {}}
+    }
+    parser = MeasurementJSONParser()
+    parsed = parser.parse_dict(data)
+    mapper = BodyParameterMapper()
+    plan = mapper.map(parsed)
+
+    # Landmarks should fall back to proportional heights
+    assert plan.landmark_heights.chest > 0
+    assert plan.landmark_heights.waist > 0
+    assert plan.landmark_heights.hip > 0
+    assert plan.landmark_heights.chest > plan.landmark_heights.waist > plan.landmark_heights.hip
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Test 6: Coordinate conversion (JSON world_y_up cm -> Blender Z-up m)
+# ──────────────────────────────────────────────────────────────────────────────
+def test_coordinate_conversion():
+    lm = LandmarkPoint(
+        name="waist_center",
+        x_cm=10.0,
+        y_cm=102.0,  # JSON Y is vertical height
+        z_cm=5.0,    # JSON Z is front-back depth
+        confidence=0.95,
+        visibility="visible",
+        source="scanner",
+    )
+    bx, by, bz = lm.to_blender()
+
+    # Blender: X=lateral (0.10m), Y=depth (0.05m), Z=height (1.02m)
+    assert math.isclose(bx, 0.10, rel_tol=1e-3)
+    assert math.isclose(by, 0.05, rel_tol=1e-3)
+    assert math.isclose(bz, 1.02, rel_tol=1e-3)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Test 7: Measurement extraction & weighting
+# ──────────────────────────────────────────────────────────────────────────────
+def test_measurement_extraction_and_weights():
+    parser = MeasurementJSONParser()
+    parsed = parser.parse_file(SAMPLE_JSON_PATH)
+
+    chest_entry = parsed.get_entry("chest_circumference_cm")
+    assert chest_entry is not None
+    assert chest_entry.value == 90.0
+    assert chest_entry.weight > 0.7  # high confidence, low uncertainty
+
+    weight_entry = parsed.get_entry("weight_kg")
+    assert weight_entry is not None
+    assert weight_entry.value is None
+    assert weight_entry.weight == 0.0  # missing measurement has 0 weight
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Test 8: Cross-section ellipse calculation
+# ──────────────────────────────────────────────────────────────────────────────
+def test_cross_section_geometry():
+    cs = CrossSectionData(region="chest", width_cm=35.0, depth_cm=24.0)
+    circ = cs.estimated_circumference_cm
+
+    # Ellipse perimeter with a=17.5, b=12.0 is around ~93.8 cm
+    assert 90.0 < circ < 96.0
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Test 9: Parameter mapping
+# ──────────────────────────────────────────────────────────────────────────────
+def test_parameter_mapping():
+    parser = MeasurementJSONParser()
+    parsed = parser.parse_file(SAMPLE_JSON_PATH)
+    mapper = BodyParameterMapper()
+    plan = mapper.map(parsed)
+
+    assert plan.target_height_m == 1.72
+    assert plan.gender == "female"
+    assert plan.shoulder_breadth_m == 0.40
+    assert "chest" in plan.regions
+    assert "waist" in plan.regions
+    assert "hip" in plan.regions

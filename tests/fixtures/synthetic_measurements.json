@@ -1,0 +1,762 @@
+{
+  "session_id": "synthetic_172",
+  "schema_version": "1.0",
+  "unit": "cm",
+  "pipeline_version": "synthetic",
+  "measurements": {
+    "height_cm": {
+      "value": 172.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "weight_kg": {
+      "value": null,
+      "method": "synthetic_test_fixture",
+      "confidence": null,
+      "uncertainty_cm": null,
+      "status": "synthetic"
+    },
+    "neck_circumference_cm": {
+      "value": 34.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "neck_base_circumference_cm": {
+      "value": 36.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "neck_length_cm": {
+      "value": 10.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "head_circumference_cm": {
+      "value": 55.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "chest_circumference_cm": {
+      "value": 90.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "upper_chest_circumference_cm": {
+      "value": 88.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "underbust_circumference_cm": {
+      "value": 78.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "waist_circumference_cm": {
+      "value": 72.5,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "abdomen_circumference_cm": {
+      "value": 80.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "high_hip_circumference_cm": {
+      "value": 88.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "hip_circumference_cm": {
+      "value": 96.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "shoulder_breadth_cm": {
+      "value": 40.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "shoulder_slope_deg": {
+      "value": 12.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "shoulder_height_diff_cm": {
+      "value": 0.5,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "back_width_cm": {
+      "value": 27.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "front_chest_width_cm": {
+      "value": 30.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "chest_depth_cm": {
+      "value": 23.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "chest_width_cm": {
+      "value": 34.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "waist_depth_cm": {
+      "value": 19.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "waist_width_cm": {
+      "value": 28.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "waist_height_cm": {
+      "value": 103.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "neck_to_shoulder_cm": {
+      "value": 10.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "armhole_depth_cm": {
+      "value": 51.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "torso_length_cm": {
+      "value": 60.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "front_torso_length_cm": {
+      "value": 18.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "back_torso_length_cm": {
+      "value": 21.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "shoulder_to_crotch_cm": {
+      "value": 82.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "crotch_depth_cm": {
+      "value": 27.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "crotch_length_cm": {
+      "value": 30.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "waist_to_hip_cm": {
+      "value": 10.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "waist_to_bust_cm": {
+      "value": 10.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "hip_breadth_cm": {
+      "value": 34.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "hip_depth_cm": {
+      "value": 22.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "sitting_height_cm": {
+      "value": 91.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "arm_span_cm": {
+      "value": 171.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "waist_to_floor_cm": {
+      "value": 103.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "torso_depth_cm": {
+      "value": 54.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "torso_width_cm": {
+      "value": 18.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "arm_reach_cm": {
+      "value": 74.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "front_rise_cm": {
+      "value": 24.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "back_rise_cm": {
+      "value": 27.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "body_rise_cm": {
+      "value": 30.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "back_shoulder_to_shoulder_cm": {
+      "value": 10.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "front_shoulder_breadth_cm": {
+      "value": 36.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "upper_arm_circumference_cm": {
+      "value": 28.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "biceps_circumference_cm": {
+      "value": 29.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "elbow_circumference_cm": {
+      "value": 24.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "forearm_circumference_cm": {
+      "value": 23.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "wrist_circumference_cm": {
+      "value": 15.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "shoulder_to_elbow_cm": {
+      "value": 31.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "elbow_to_wrist_cm": {
+      "value": 25.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "shoulder_to_wrist_cm": {
+      "value": 56.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "armhole_circumference_cm": {
+      "value": 32.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "hand_length_cm": {
+      "value": 18.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "hand_breadth_cm": {
+      "value": 8.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "inseam_cm": {
+      "value": 79.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "outseam_cm": {
+      "value": 101.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "crotch_to_waist_front_cm": {
+      "value": 10.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "crotch_to_waist_back_cm": {
+      "value": 10.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "thigh_circumference_cm": {
+      "value": 54.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "mid_thigh_circumference_cm": {
+      "value": 48.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "knee_circumference_cm": {
+      "value": 36.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "calf_circumference_cm": {
+      "value": 35.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "ankle_circumference_cm": {
+      "value": 21.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "hip_to_knee_cm": {
+      "value": 10.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "knee_to_ankle_cm": {
+      "value": 10.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "foot_length_cm": {
+      "value": 24.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    },
+    "foot_breadth_cm": {
+      "value": 9.0,
+      "method": "synthetic_test_fixture",
+      "confidence": 0.95,
+      "uncertainty_cm": 0.5,
+      "status": "synthetic"
+    }
+  },
+  "landmarks_3d": {
+    "coordinate_frame": "world_y_up",
+    "coordinate_unit": "cm",
+    "points": {
+      "head_top": {
+        "x": 0.0,
+        "y": 172.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "crown": {
+        "x": 0.0,
+        "y": 172.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "chin": {
+        "x": 0.0,
+        "y": 151.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "neck_base": {
+        "x": 0.0,
+        "y": 143.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "left_shoulder_joint": {
+        "x": -10.0,
+        "y": 141.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "right_shoulder_joint": {
+        "x": 10.0,
+        "y": 141.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "upper_chest": {
+        "x": 0.0,
+        "y": 124.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "sternum": {
+        "x": 0.0,
+        "y": 124.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "waist_center": {
+        "x": 0.0,
+        "y": 103.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "navel": {
+        "x": 0.0,
+        "y": 103.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "pelvis_center": {
+        "x": 0.0,
+        "y": 89.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "crotch": {
+        "x": 0.0,
+        "y": 83.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "left_knee": {
+        "x": -10.0,
+        "y": 48.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "right_knee": {
+        "x": 10.0,
+        "y": 48.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "left_ankle": {
+        "x": -10.0,
+        "y": 8.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "right_ankle": {
+        "x": 10.0,
+        "y": 8.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "left_elbow": {
+        "x": -10.0,
+        "y": 76.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "right_elbow": {
+        "x": 10.0,
+        "y": 72.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "left_wrist": {
+        "x": -10.0,
+        "y": 68.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "right_wrist": {
+        "x": 10.0,
+        "y": 64.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "left_hip": {
+        "x": -10.0,
+        "y": 60.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "right_hip": {
+        "x": 10.0,
+        "y": 56.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "left_heel": {
+        "x": -10.0,
+        "y": 52.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "right_heel": {
+        "x": 10.0,
+        "y": 48.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "left_foot_tip": {
+        "x": -10.0,
+        "y": 44.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "right_foot_tip": {
+        "x": 10.0,
+        "y": 40.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "left_eye": {
+        "x": -10.0,
+        "y": 36.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "right_eye": {
+        "x": 10.0,
+        "y": 32.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "nose_tip": {
+        "x": 0.0,
+        "y": 28.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "left_ear": {
+        "x": -10.0,
+        "y": 24.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      },
+      "right_ear": {
+        "x": 10.0,
+        "y": 20.0,
+        "z": 0.0,
+        "confidence": 0.95,
+        "visibility": "visible",
+        "source": "synthetic_test_fixture"
+      }
+    }
+  },
+  "gender_classification": {
+    "final_gender": "female",
+    "overall_confidence": 0.95,
+    "consensus": "synthetic"
+  },
+  "shape_classification": {
+    "shape": "Hourglass",
+    "shape_code": "hourglass",
+    "category_type": "synthetic"
+  }
+}
