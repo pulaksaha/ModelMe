@@ -149,14 +149,21 @@ class MeasurementValidator:
         # 1. Unit check
         self._check_unit(parsed, report)
 
-        # 2. Per-field range and presence checks
+        # 2. Per-field range and presence checks. Missing fields outside the
+        # critical/important sets remain visible in missing_measurements, but
+        # do not produce warnings when this engine does not consume them.
         for name in set(CRITICAL_FIELDS) | set(IMPORTANT_FIELDS) | set(parsed.measurements.keys()):
             entry = parsed.measurements.get(name)
             result = self._validate_field(name, entry)
             report.field_results.append(result)
             if result.status == 'out_of_range':
-                report.errors.append(f"{name}: {result.message}")
-            elif result.status in ('missing', 'low_confidence', 'unit_suspect'):
+                if result.is_critical:
+                    report.errors.append(f"{name}: {result.message}")
+                else:
+                    report.warnings.append(f"{name}: {result.message}")
+            elif result.status == 'missing' and (result.is_critical or name in IMPORTANT_FIELDS):
+                report.warnings.append(f"{name}: {result.message}")
+            elif result.status in ('low_confidence', 'unit_suspect'):
                 report.warnings.append(f"{name}: {result.message}")
 
         # 3. Internal consistency
@@ -167,9 +174,13 @@ class MeasurementValidator:
 
         # 5. Determine overall status
         critical_missing = report.missing_critical()
-        if critical_missing or report.out_of_range_fields():
+        critical_out_of_range = [
+            result.name for result in report.field_results
+            if result.is_critical and result.status == 'out_of_range'
+        ]
+        if critical_missing or critical_out_of_range:
             report.overall_status = "fail"
-            report.errors.insert(0, f"Critical fields missing or invalid: {critical_missing}")
+            report.errors.insert(0, f"Critical fields missing or invalid: {critical_missing or critical_out_of_range}")
         elif report.warnings:
             report.overall_status = "warn"
 
@@ -207,6 +218,34 @@ class MeasurementValidator:
             return FieldValidationResult(
                 name=name, status="missing", value=None,
                 message=f"'{name}' is null (status: {entry.status})",
+                is_critical=is_critical,
+            )
+
+        # Bilateral fields are validated side by side. Never collapse them into
+        # a single scalar just to reuse the range check.
+        if entry.value is None:
+            populated_sides = {
+                side: item.value for side, item in entry.sides.items()
+                if item.value is not None
+            }
+            if not populated_sides:
+                return FieldValidationResult(
+                    name=name, status="missing", value=None,
+                    message=f"'{name}' has no scalar or populated side value",
+                    is_critical=is_critical,
+                )
+            if name in MEASUREMENT_RANGES:
+                lo, hi = MEASUREMENT_RANGES[name]
+                invalid = {side: value for side, value in populated_sides.items() if not lo <= value <= hi}
+                if invalid:
+                    return FieldValidationResult(
+                        name=name, status="out_of_range", value=None,
+                        message=f"'{name}' side values outside [{lo}, {hi}]: {invalid}",
+                        is_critical=is_critical,
+                    )
+            return FieldValidationResult(
+                name=name, status="ok", value=None,
+                message=f"bilateral values validated independently: {', '.join(populated_sides)}",
                 is_critical=is_critical,
             )
 

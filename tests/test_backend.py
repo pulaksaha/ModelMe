@@ -20,7 +20,7 @@ from fastapi.testclient import TestClient
 from backend.main import app
 
 client = TestClient(app)
-SAMPLE_JSON_PATH = Path(__file__).resolve().parent / "fixtures" / "synthetic_measurements.json"
+SAMPLE_JSON_PATH = Path(__file__).resolve().parent / "fixtures" / "synthetic_sparse_measurements.json"
 
 
 def test_health_endpoint():
@@ -45,8 +45,12 @@ def test_upload_valid_json():
     assert "job_id" in data
     assert data["session_id"] == "synthetic_172"
     assert data["unit"] == "cm"
-    assert len(data["available_measurements"]) >= 40
+    assert len(data["available_measurements"]) == 45
+    assert data["landmark_count"] == 31
     assert "height_cm" in data["available_measurements"]
+    assert "hand_length_cm" in data["missing_measurements"]
+    assert data["validation_status"] == "pass"
+    assert not any("hand_length_cm" in warning for warning in data["validation_warnings"])
 
 
 def test_upload_invalid_format():

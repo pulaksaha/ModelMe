@@ -35,6 +35,7 @@ from reconstruction.measurement_validator import (
     ValidationReport,
 )
 from reconstruction.body_parameter_mapper import BodyParameterMapper
+from reconstruction.exported_mesh_validator import _record, _target
 
 
 SAMPLE_JSON_PATH = Path(__file__).resolve().parent / "fixtures" / "synthetic_measurements.json"
@@ -76,6 +77,94 @@ def test_missing_measurements_handling():
     assert parsed.get_value("height_cm") == 175.0
     assert parsed.get_value("thigh_circumference_cm") is None
     assert "thigh_circumference_cm" in parsed.missing_measurements()
+
+
+def test_bilateral_measurements_preserve_each_side_and_metadata():
+    parsed = MeasurementJSONParser().parse_dict({"unit": "cm", "measurements": {
+        "hand_length_cm": {
+            "left": {"value": 18.2, "method": "landmark_distance", "confidence": 0.7, "status": "estimated"},
+            "right": {"value": 18.8, "method": "landmark_distance", "confidence": 0.8, "status": "estimated"},
+        },
+        "crotch_to_waist_front_cm": {
+            "left": {"value": 31.0}, "right": {"value": None},
+        },
+        "weight_kg": {"value": None},
+    }})
+
+    hand = parsed.get_entry("hand_length_cm")
+    assert hand is not None and hand.is_valid
+    assert hand.value is None  # no silent averaging into a scalar
+    assert parsed.get_value("hand_length_cm") is None
+    assert parsed.get_side_value("hand_length_cm", "left") == 18.2
+    assert parsed.get_side_value("hand_length_cm", "right") == 18.8
+    assert hand.sides["left"].method == "landmark_distance"
+    assert hand.sides["right"].confidence == 0.8
+    assert parsed.get_side_value("crotch_to_waist_front_cm", "left") == 31.0
+    assert parsed.get_side_value("crotch_to_waist_front_cm", "right") is None
+    assert parsed.get_value("weight_kg") is None
+    assert "hand_length_cm" in parsed.available_measurements()
+    assert "weight_kg" in parsed.missing_measurements()
+
+
+def test_bilateral_schema_rejects_malformed_side_and_nonfinite_values():
+    with pytest.raises(ValueError, match="left must be an object"):
+        MeasurementJSONParser().parse_dict({"measurements": {"arm_cm": {"left": 2}}})
+    with pytest.raises(ValueError, match="finite"):
+        MeasurementJSONParser().parse_dict({"measurements": {"arm_cm": {"right": {"value": "NaN"}}}})
+
+
+def test_bilateral_values_are_range_checked_without_collapsing_sides():
+    parsed = MeasurementJSONParser().parse_dict({"measurements": {
+        "thigh_circumference_cm": {
+            "left": {"value": 54}, "right": {"value": 55},
+        },
+    }})
+    result = next(r for r in MeasurementValidator().validate(parsed).field_results
+                  if r.name == "thigh_circumference_cm")
+    assert result.status == "ok"
+    assert result.value is None
+
+
+def test_landmark_null_coordinate_is_not_replaced_with_zero():
+    with pytest.raises(ValueError, match="requires non-null x, y, and z"):
+        MeasurementJSONParser().parse_dict({"landmarks_3d": {"points": {
+            "left_shoulder": {"x": None, "y": 100, "z": 2}
+        }}})
+
+
+def test_independent_report_derives_bilateral_target_explicitly_and_marks_unsupported():
+    parsed = MeasurementJSONParser().parse_dict({"measurements": {
+        "thigh_circumference_cm": {
+            "left": {"value": 52, "method": "mesh_cross_section"},
+            "right": {"value": 54, "method": "mesh_cross_section"},
+        },
+    }})
+    target, source = _target(parsed, "thigh_circumference_cm")
+    assert target == 53
+    assert "arithmetic mean" in source
+    assert _record(target, None, "unsupported", target_method=source)["status"] == "unsupported"
+    passed = _record(90, 90.5, "slice perimeter", target_method="manual")
+    assert passed["absolute_error_cm"] == 0.5
+    assert passed["percentage_error"] == pytest.approx(0.556, abs=0.001)
+    assert passed["pass"] is True
+
+
+def test_null_unused_hand_measurement_is_optional_and_does_not_warn():
+    data = json.loads(SAMPLE_JSON_PATH.read_text())
+    data["measurements"]["hand_length_cm"]["value"] = None
+    data["measurements"]["hand_length_cm"]["status"] = None
+
+    parser = MeasurementJSONParser()
+    parsed = parser.parse_dict(data)
+    report = MeasurementValidator().validate(parsed)
+    plan = BodyParameterMapper().map(parsed)
+
+    assert parsed.get_value("hand_length_cm") is None
+    assert "hand_length_cm" in parsed.missing_measurements()
+    assert "hand_length_cm" not in report.missing_critical()
+    assert not any("hand_length_cm" in warning for warning in report.warnings)
+    assert report.is_valid
+    assert set(plan.regions) == {"chest", "upper_chest", "underbust", "waist", "abdomen", "high_hip", "hip", "neck"}
 
 
 # ──────────────────────────────────────────────────────────────────────────────

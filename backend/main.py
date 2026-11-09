@@ -80,13 +80,14 @@ svc = ReconstructionService(PROJECT_ROOT)
 
 @app.get("/api/health")
 async def health_check():
-    blender_ok = Path(BLENDER_EXECUTABLE).exists()
+    blender_path = shutil.which(BLENDER_EXECUTABLE) or BLENDER_EXECUTABLE
+    blender_ok = Path(blender_path).is_file() and os.access(blender_path, os.X_OK)
     blend_ok   = BASE_BLEND_FILE.exists()
     return {
         "status":        "ok" if (blender_ok and blend_ok) else "degraded",
         "blender_found": blender_ok,
         "base_blend_found": blend_ok,
-        "blender_path":  BLENDER_EXECUTABLE,
+        "blender_path":  blender_path,
         "base_blend":    str(BASE_BLEND_FILE),
     }
 

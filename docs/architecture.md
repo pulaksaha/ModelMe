@@ -16,7 +16,7 @@ MongoDB stores user/profile/measurement data and generation metadata. GLB binari
 ## Current architecture and migration bridge
 
 ```text
-React/Vite → Vite /api proxy → Express health/auth/profile API
+React/Vite → Vite /api proxy → Express health/auth/job-ownership API
                                   │
                                   └→ temporary proxy → FastAPI job API
                                                          │
@@ -25,6 +25,8 @@ React/Vite → Vite /api proxy → Express health/auth/profile API
 ```
 
 The existing FastAPI app remains the temporary owner of upload and model-generation routes until Phase 6 has a compatible Express job API and Python worker. The existing `reconstruction/` modules remain the source of measurement/deformation behavior until a moved copy passes parity checks. Do not delete either legacy path as part of Phase 1 cleanup.
+
+The temporary Python HTTP interface is documented in [service-contract.md](service-contract.md). Express owns the browser-facing `/api` entry point. Its readiness endpoint checks both MongoDB connectivity and the Python service health response; Python health reports Blender executable and base mesh availability separately. Liveness does not depend on either service.
 
 ## Phase 1 service layout
 
@@ -60,3 +62,6 @@ tests/{api,frontend,processing,e2e}/
 6. **Pin native runtimes.** Python and Blender versions must be explicit in the worker image and verified against the checked-in `.blend` asset.
 7. **Retain unverified assets.** Only the root `base_human.blend` is known to be byte-identical to `assets/base_human/base_human.blend`. Other root `.blend` variants remain until Phase 4 identifies their value.
 8. **Deployment is a gated outcome.** Docker is not installed locally. Compose files can be prepared, but deployment is not complete until a container build, health check, sample reconstruction and secured deployment pass.
+9. **Separate input claims from verified provenance.** The measurement JSON's `method`, `confidence`, and `uncertainty` fields are retained as source metadata, but ModelMe does not treat them as proof of person detection. The audited producer is external to this repository and its landmarks declare `reconstruction_model` as their source.
+10. **Validate the artifact after export.** Blender export success and source-mesh sanity are not accuracy criteria. `reconstruction/exported_mesh_validator.py` re-imports the GLB and writes per-metric target/generated/error/pass data. Unsupported geometry measurements fail overall validation rather than being inferred from visual appearance.
+11. **Do not collapse bilateral observations at parse time.** Left and right values and provenance are preserved independently. Any later aggregation must name and document its method in the output report.

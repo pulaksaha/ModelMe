@@ -32,15 +32,23 @@ test('unknown API routes return JSON 404 responses', async () => {
 })
 
 test('readiness is healthy when MongoDB is connected', () => {
-  const result = readiness(true)
+  const result = readiness(true, true)
   assert.equal(result.httpStatus, 200)
   assert.equal(result.body.status, 'ready')
   assert.equal(result.body.dependencies.mongodb, 'connected')
+  assert.equal(result.body.dependencies.reconstruction, 'available')
 })
 
 test('readiness is degraded when MongoDB is disconnected', () => {
-  const result = readiness(false)
+  const result = readiness(false, true)
   assert.equal(result.httpStatus, 503)
   assert.equal(result.body.status, 'degraded')
   assert.equal(result.body.dependencies.mongodb, 'disconnected')
+})
+
+test('readiness is degraded when reconstruction service is unavailable', () => {
+  const result = readiness(true, false)
+  assert.equal(result.httpStatus, 503)
+  assert.equal(result.body.dependencies.mongodb, 'connected')
+  assert.equal(result.body.dependencies.reconstruction, 'unavailable')
 })

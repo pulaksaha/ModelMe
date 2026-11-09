@@ -178,6 +178,12 @@ def main():
 
         # Apply object scale to mesh data so vertex positions are in world space
         bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+        base_coordinates = [tuple(v.co) for v in recon_obj.data.vertices]
+        base_bounds = {
+            "width_cm": base_obj.dimensions.x * 100,
+            "depth_cm": base_obj.dimensions.y * 100,
+            "height_cm": base_obj.dimensions.z * 100,
+        }
 
         logger.info(
             f"Reconstruction object created: '{recon_name}' "
@@ -190,6 +196,13 @@ def main():
         report_progress("Applying body deformation", 30, job_id, output_dir)
         deformer = BodyDeformer(recon_obj, plan)
         deformer.apply_all()
+        changed_vertices = 0
+        max_vertex_displacement_m = 0.0
+        for before, vertex in zip(base_coordinates, recon_obj.data.vertices):
+            displacement = (mathutils.Vector(before) - vertex.co).length
+            if displacement > 1e-6:
+                changed_vertices += 1
+            max_vertex_displacement_m = max(max_vertex_displacement_m, displacement)
 
         # -------------------------------------------------------------------
         # Stage 5: Optimisation loop
@@ -247,6 +260,18 @@ def main():
             raise RuntimeError(f"GLB export failed: {export_result.error}")
 
         full_report["export"] = export_result.to_dict()
+        full_report["geometry_change"] = {
+            "source_vertex_count": len(base_coordinates),
+            "changed_vertex_count": changed_vertices,
+            "max_vertex_displacement_cm": round(max_vertex_displacement_m * 100, 4),
+            "base_mesh_dimensions_cm": {k: round(v, 3) for k, v in base_bounds.items()},
+            "comparison": "copied base Human mesh coordinates before deformation versus reconstructed mesh coordinates before export",
+        }
+        from reconstruction.exported_mesh_validator import validate_exported_glb
+        full_report["independent_glb_validation"] = validate_exported_glb(
+            glb_path, parsed, plan
+        )
+        full_report["geometry_change"]["exported_glb_dimensions_cm"] = full_report["independent_glb_validation"]["mesh_dimensions_cm"]
 
         # -------------------------------------------------------------------
         # Stage 9: Save reports
@@ -261,6 +286,8 @@ def main():
             "report_path": str(report_path),
             "converged": opt_report.converged,
             "iterations": opt_report.iterations_run,
+            "independent_validation_passed": full_report["independent_glb_validation"]["passed"],
+            "geometry_change": full_report["geometry_change"],
             "measurements": {
                 k: {
                     "target_cm": c.target_cm,

@@ -50,6 +50,8 @@ services:
       API_PORT: 3001
       MONGODB_URI: mongodb://mongo:27017/modelme
       PROCESSING_SERVICE_URL: http://reconstruction:8000
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env before starting Compose}
+      SESSION_TTL_SECONDS: ${SESSION_TTL_SECONDS:-1800}
     ports:
       - "${BIND_ADDRESS:-127.0.0.1}:${PORT:-8080}:3001"
     depends_on:

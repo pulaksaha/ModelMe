@@ -9,12 +9,19 @@
   "scripts": {
     "dev": "node --env-file-if-exists=../../.env --watch src/server.js",
     "start": "node --env-file-if-exists=../../.env src/server.js",
-    "test": "node --test"
+    "test": "node --env-file-if-exists=../../.env --test"
   },
   "dependencies": {
+    "argon2": "^0.45.2",
+    "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "http-proxy-middleware": "^3.0.5",
-    "mongoose": "^9.9.3"
+    "jose": "^6.2.15",
+    "mongoose": "^9.9.3",
+    "zod": "^4.6.7"
+  },
+  "allowScripts": {
+    "argon2@0.45.2": true
   }
 }

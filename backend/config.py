@@ -2,6 +2,7 @@
 Backend configuration
 """
 import os
+import shutil
 from pathlib import Path
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -19,10 +20,23 @@ STORAGE_DIR = PROJECT_ROOT / "storage" / "generated"
 # ──────────────────────────────────────────────────────────────────────────────
 # Blender
 # ──────────────────────────────────────────────────────────────────────────────
-BLENDER_EXECUTABLE = os.environ.get(
-    "BLENDER_EXECUTABLE",
-    "/Applications/Blender.app/Contents/MacOS/Blender",
-)
+def _detect_blender_executable() -> str:
+    configured = os.environ.get("BLENDER_EXECUTABLE")
+    if configured:
+        return str(Path(configured).expanduser())
+
+    candidates = [
+        shutil.which("blender"),
+        "/Applications/Blender.app/Contents/MacOS/Blender",
+        str(Path.home() / "Applications/Blender.app/Contents/MacOS/Blender"),
+    ]
+    for candidate in candidates:
+        if candidate and Path(candidate).is_file() and os.access(candidate, os.X_OK):
+            return str(Path(candidate).resolve())
+    return "blender"
+
+
+BLENDER_EXECUTABLE = _detect_blender_executable()
 BLENDER_SCRIPT = PROJECT_ROOT / "blender" / "reconstruct.py"
 
 # ──────────────────────────────────────────────────────────────────────────────

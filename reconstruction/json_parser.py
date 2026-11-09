@@ -24,6 +24,16 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 @dataclass
+class MeasurementSide:
+    """One side of a bilateral measurement, retaining its own provenance."""
+    value: Optional[float]
+    method: Optional[str] = None
+    confidence: Optional[float] = None
+    uncertainty_cm: Optional[float] = None
+    status: Optional[str] = None
+
+
+@dataclass
 class MeasurementEntry:
     """A single measurement field from the JSON."""
     name: str
@@ -32,11 +42,17 @@ class MeasurementEntry:
     confidence: Optional[float]
     uncertainty_cm: Optional[float]
     status: Optional[str]
+    sides: Dict[str, MeasurementSide] = field(default_factory=dict)
 
     @property
     def is_valid(self) -> bool:
         """True if the value is present and not null."""
-        return self.value is not None
+        return self.value is not None or any(side.value is not None for side in self.sides.values())
+
+    def side_value(self, side: str) -> Optional[float]:
+        """Return an explicit bilateral value; never infer an aggregate."""
+        item = self.sides.get(side.lower())
+        return item.value if item else None
 
     @property
     def weight(self) -> float:
@@ -62,7 +78,7 @@ class LandmarkPoint:
     x_cm: float   # lateral (left positive in JSON)
     y_cm: float   # vertical (height) in JSON world_y_up frame
     z_cm: float   # depth (front positive in JSON)
-    confidence: float
+    confidence: Optional[float]
     visibility: str
     source: str
 
@@ -155,13 +171,18 @@ class ParsedMeasurements:
     # -----------------------------------------------------------------------
 
     def get_value(self, field_name: str) -> Optional[float]:
-        """Return measurement value or None if missing/null."""
+        """Return a scalar measurement only; bilateral fields have no scalar value."""
         entry = self.measurements.get(field_name)
         return entry.value if entry else None
 
     def get_entry(self, field_name: str) -> Optional[MeasurementEntry]:
         """Return the full MeasurementEntry or None."""
         return self.measurements.get(field_name)
+
+    def get_side_value(self, field_name: str, side: str) -> Optional[float]:
+        """Return a left/right measurement without collapsing the two sides."""
+        entry = self.measurements.get(field_name)
+        return entry.side_value(side) if entry else None
 
     def available_measurements(self) -> List[str]:
         """List all measurement field names that have non-null values."""
@@ -264,14 +285,21 @@ class MeasurementJSONParser:
             if not isinstance(entry_data, dict):
                 logger.warning(f"Skipping non-dict measurement entry: {name}")
                 continue
-            raw_value = entry_data.get("value")
-            # Coerce value to float if possible
-            value: Optional[float] = None
-            if raw_value is not None:
-                try:
-                    value = float(raw_value)
-                except (TypeError, ValueError):
-                    logger.warning(f"Cannot parse value for {name}: {raw_value!r}")
+            value = self._number(entry_data.get("value"), f"{name}.value")
+            sides: Dict[str, MeasurementSide] = {}
+            for side_name in ("left", "right"):
+                if side_name not in entry_data:
+                    continue
+                side_data = entry_data[side_name]
+                if not isinstance(side_data, dict):
+                    raise ValueError(f"{name}.{side_name} must be an object")
+                sides[side_name] = MeasurementSide(
+                    value=self._number(side_data.get("value"), f"{name}.{side_name}.value"),
+                    method=side_data.get("method"),
+                    confidence=side_data.get("confidence"),
+                    uncertainty_cm=side_data.get("uncertainty_cm"),
+                    status=side_data.get("status"),
+                )
 
             result[name] = MeasurementEntry(
                 name=name,
@@ -280,8 +308,23 @@ class MeasurementJSONParser:
                 confidence=entry_data.get("confidence"),
                 uncertainty_cm=entry_data.get("uncertainty_cm"),
                 status=entry_data.get("status"),
+                sides=sides,
             )
         return result
+
+    @staticmethod
+    def _number(raw_value: Any, label: str) -> Optional[float]:
+        """Convert a present numeric value; preserve null and reject malformed values."""
+        if raw_value is None:
+            return None
+        try:
+            import math
+            value = float(raw_value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"{label} must be numeric or null") from exc
+        if not math.isfinite(value):
+            raise ValueError(f"{label} must be finite")
+        return value
 
     def _parse_landmarks(self, raw_points: Dict[str, Any]) -> Dict[str, LandmarkPoint]:
         """Parse landmarks_3d.points block."""
@@ -289,10 +332,12 @@ class MeasurementJSONParser:
         for name, pt in raw_points.items():
             if not isinstance(pt, dict):
                 continue
-            # Gracefully handle missing coords
-            x = pt.get("x", 0.0)
-            y = pt.get("y", 0.0)
-            z = pt.get("z", 0.0)
+            # A missing coordinate is unknown, not the origin.
+            if any(pt.get(axis) is None for axis in ("x", "y", "z")):
+                raise ValueError(f"landmarks_3d.points.{name} requires non-null x, y, and z")
+            x = pt["x"]
+            y = pt["y"]
+            z = pt["z"]
             try:
                 x, y, z = float(x), float(y), float(z)
             except (TypeError, ValueError):
@@ -304,7 +349,7 @@ class MeasurementJSONParser:
                 x_cm=x,
                 y_cm=y,
                 z_cm=z,
-                confidence=float(pt.get("confidence", 1.0)),
+                confidence=self._number(pt.get("confidence"), f"landmarks_3d.points.{name}.confidence"),
                 visibility=pt.get("visibility", "unknown"),
                 source=pt.get("source", "unknown"),
             )
